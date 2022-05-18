@@ -17,7 +17,22 @@ class App extends Component {
     ],
     filter: '',
   };
+  componentDidMount() {
+    const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
 
+    if (parsedContacts) {
+      this.setState({ contacts: parsedContacts });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const newContacts = this.state.contacts;
+    const prevContacts = prevState.contacts;
+
+    if (newContacts !== prevContacts) {
+      localStorage.setItem('contacts', JSON.stringify(newContacts));
+    }
+  }
   repeatCheck = newName => {
     return this.state.contacts.find(
       ({ name }) => name.toLowerCase() === newName
@@ -82,10 +97,14 @@ class App extends Component {
             <h2 className={s.contact}>Filter Contacts</h2>
             <Filter name={filter} onChange={this.setFilterValue} />
             <h2 className={s.contact}>Contacts</h2>
-            <ContactList
-              contacts={ResultSearch}
-              onDeleteContact={this.deleteContact}
-            />
+            {this.state.contacts[0] && ResultSearch[0] ? (
+              <ContactList
+                contacts={ResultSearch}
+                onDeleteContact={this.deleteContact}
+              />
+            ) : (
+              <p className={s.text}>There’s nothing here yet...</p>
+            )}
           </div>
         </Section>
       </>
